@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Max Cloud 测试用例展示</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .navbar {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+            padding: 15px 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #00d2ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero {
+            padding: 150px 30px 80px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #fff, #00d2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            color: #888;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+        .cases-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px 80px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .case-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.4s;
+            cursor: pointer;
+        }
+        .case-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,210,255,0.3);
+        }
+        .case-icon { font-size: 3rem; margin-bottom: 15px; }
+        .case-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+        .case-desc { color: #888; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px; }
+        .case-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+        .tag {
+            padding: 4px 12px;
+            background: rgba(0,210,255,0.1);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            color: #00d2ff;
+        }
+        .section-title {
+            font-size: 1.5rem;
+            margin: 50px 0 25px;
+            padding-left: 30px;
+            color: #fff;
+        }
+        .section-title::before { content: '▸'; margin-right: 10px; color: #00d2ff; }
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">☁️ Max Cloud 测试中心</div>
+        </div>
+    </nav>
+    <section class="hero">
+        <h1>Max Cloud 用例展示</h1>
+        <p>展示MiniMax模型在各场景下的能力</p>
+    </section>
+    <h2 class="section-title">🎮 游戏娱乐</h2>
+    <div class="cases-grid">
+        <div class="case-card" onclick="location.href='game_racing.html'">
+            <div class="case-icon">🏎️</div>
+            <div class="case-title">3D赛车竞速</div>
+            <div class="case-desc">Three.js实现的3D赛车游戏躲避障碍，收集金币，支持键盘控制</div>
+            <div class="case-tags">
+                <span class="tag">3D游戏</span>
+                <span class="tag">Three.js</span>
+                <span class="tag">赛车</span>
+            </div>
+        </div>
+        <div class="case-card" onclick="location.href='game_fortune.html'">
+            <div class="case-icon">🔮</div>
+            <div class="case-title">八字命理排盘系统</div>
+            <div class="case-desc">输入出生信息，AI解析命盘</div>
+            <div class="case-tags">
+                <span class="tag">命理</span>
+                <span class="tag">八字</span>
+            </div>
+        </div>
+        <div class="case-card" onclick="location.href='game_2048.html'">
+            <div class="case-icon">🎲</div>
+            <div class="case-title">2048数字消除</div>
+            <div class="case-desc">经典数字合成游戏</div>
+            <div class="case-tags">
+                <span class="tag">游戏</span>
+                <span class="tag">益智</span>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>☁️ Max Cloud 测试用例展示 | Powered by MiniMax</p>
+    </footer>
+</body>
+</html>

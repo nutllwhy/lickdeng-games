@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔮 八字命理排盘系统</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #feca57, #ff6b6b, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+        
+        /* 输入表单 */
+        .form-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .form-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #feca57;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .form-group input, .form-group select {
+            padding: 12px 15px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: #feca57;
+        }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #feca57, #ff6b6b);
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .btn:hover { transform: scale(1.02); }
+        
+        /* 结果展示 */
+        .result { display: none; }
+        .result.show { display: block; }
+        
+        /* 命盘展示 */
+        .bazi-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .bazi-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: #feca57;
+        }
+        .bazi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .bazi-col {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .bazi-col-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+        .bazi-col-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #feca57;
+        }
+        
+        /* 分析内容 */
+        .analysis-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .analysis-section {
+            margin-bottom: 25px;
+        }
+        .analysis-section h3 {
+            font-size: 1.1rem;
+            color: #48dbfb;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .analysis-section p {
+            color: #ccc;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+        
+        /* 五行统计 */
+        .wuxing-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .wuxing-item {
+            text-align: center;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .wuxing-name { font-size: 1.2rem; font-weight: bold; }
+        .wuxing-wood { color: #2ecc71; }
+        .wuxing-fire { color: #e74c3c; }
+        .wuxing-earth { color: #f39c12; }
+        .wuxing-metal { color: #bdc3c7; }
+        .wuxing-water { color: #3498db; }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        .loading.show { display: block; }
+        .loading-dots span {
+            animation: blink 1.4s infinite both;
+            font-size: 2rem;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔮 八字命理排盘系统</h1>
+        <p class="subtitle">输入基本信息，AI为您解析命盘</p>
+        
+        <!-- 输入表单 -->
+        <div class="form-card">
+            <div class="form-title">📋 基本信息</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>出生年份</label>
+                    <input type="number" id="year" placeholder="1990" min="1900" max="2025" value="1995">
+                </div>
+                <div class="form-group">
+                    <label>出生月份</label>
+                    <input type="number" id="month" placeholder="1-12" min="1" max="12" value="6">
+                </div>
+                <div class="form-group">
+                    <label>出生日期</label>
+                    <input type="number" id="day" placeholder="1-31" min="1" max="31" value="15">
+                </div>
+                <div class="form-group">
+                    <label>出生时辰</label>
+                    <select id="hour">
+                        <option value="子">子时 (23-1点)</option>
+                        <option value="丑">丑时 (1-3点)</option>
+                        <option value="寅">寅时 (3-5点)</option>
+                        <option value="卯">卯时 (5-7点)</option>
+                        <option value="辰">辰时 (7-9点)</option>
+                        <option value="巳">巳时 (9-11点)</option>
+                        <option value="午">午时 (11-13点)</option>
+                        <option value="未">未时 (13-15点)</option>
+                        <option value="申">申时 (15-17点)</option>
+                        <option value="酉">酉时 (17-19点)</option>
+                        <option value="戌">戌时 (19-21点)</option>
+                        <option value="亥">亥时 (21-23点)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>出生地点（城市）</label>
+                    <input type="text" id="place" placeholder="北京" value="北京">
+                </div>
+                <div class="form-group">
+                    <label>性别</label>
+                    <select id="gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn" onclick="calculateBazi()">🔮 开始排盘</button>
+        </div>
+        
+        <!-- 加载中 -->
+        <div class="loading" id="loading">
+            <div class="loading-dots"><span>🤔</span><span>🤔</span><span>🤔</span></div>
+            <p style="margin-top:15px;color:#888;">AI正在分析命盘...</p>
+        </div>
+        
+        <!-- 结果 -->
+        <div class="result" id="result">
+            <!-- 命盘 -->
+            <div class="bazi-card">
+                <div class="bazi-title">📊 命盘信息</div>
+                <div class="bazi-grid">
+                    <div class="bazi-col">
+                        <div class="bazi-col-label">年柱</div>
+                        <div class="bazi-col-value" id="bz-year">-</div>
+                    </div>
+                    <div class="bazi-col">
+                        <div class="bazi-col-label">月柱</div>
+                        <div class="bazi-col-value" id="bz-month">-</div>
+                    </div>
+                    <div class="bazi-col">
+                        <div class="bazi-col-label">日柱</div>
+                        <div class="bazi-col-value" id="bz-day">-</div>
+                    </div>
+                    <div class="bazi-col">
+                        <div class="bazi-col-label">时柱</div>
+                        <div class="bazi-col-value" id="bz-hour">-</div>
+                    </div>
+                </div>
+                <div class="wuxing-stats" id="wuxing-stats"></div>
+            </div>
+            
+            <!-- 性格分析 -->
+            <div class="analysis-card">
+                <div class="analysis-section">
+                    <h3>🧠 性格特点</h3>
+                    <p id="personality">-</p>
+                </div>
+                <div class="analysis-section">
+                    <h3>💕 感情运势</h3>
+                    <p id="love">-</p>
+                </div>
+                <div class="analysis-section">
+                    <h3>💼 事业发展</h3>
+                    <p id="career">-</p>
+                </div>
+                <div class="analysis-section">
+                    <h3>💰 财运分析</h3>
+                    <p id="fortune">-</p>
+                </div>
+                <div class="analysis-section">
+                    <h3>👨‍👩‍👧 与父母关系</h3>
+                    <p id="family">-</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 天干地支
+        const tiangan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+        const dizhi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+        
+        // 五行对应
+        const wuxingMap = {
+            '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土',
+            '庚': '金', '辛': '金', '壬': '水', '癸': '水',
+            '子': '水', '丑': '土', '寅': '木', '卯': '木', '辰': '土', '巳': '火',
+            '午': '火', '未': '土', '申': '金', '酉': '金', '戌': '土', '亥': '水'
+        };
+        
+        // 计算八字
+        function calculateBaziInternal(year, month, day, hourIndex) {
+            const tgYear = (year - 4) % 10;
+            const tgMonth = (year * 2 + month) % 10;
+            const tgDay = (year * 3 + month * 2 + day) % 10;
+            const tgHour = (tgDay * 2 + hourIndex + 2) % 10;
+            return [tiangan[tgYear], tiangan[tgMonth], tiangan[tgDay], tiangan[tgHour]];
+        }
+        
+        function calculateDizhiInternal(year, month, day, hourIndex) {
+            const dzYear = (year - 4) % 12;
+            const dzMonth = (year * 2 + month) % 12;
+            const dzDay = (year + month + day) % 12;
+            const dzHour = (hourIndex + 2) % 12;
+            return [dizhi[dzYear], dizhi[dzMonth], dizhi[dzDay], dizhi[dzHour]];
+        }
+        
+        // 计算八字
+        function calculateBazi() {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+            const day = parseInt(document.getElementById('day').value);
+            const hour = document.getElementById('hour').value;
+            const place = document.getElementById('place').value;
+            const gender = document.getElementById('gender').value;
+            
+            if (!year || !month || !day) {
+                alert('请填写完整的出生信息');
+                return;
+            }
+            
+            // 显示加载
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('result').classList.remove('show');
+            
+            // 时辰索引
+            const hourIndex = dizhi.indexOf(hour);
+            
+            // 计算八字
+            const tianganResult = calculateBaziInternal(year, month, day, hourIndex);
+            const dizhiResult = calculateDizhiInternal(year, month, day, hourIndex);
+            
+            // 显示命盘
+            document.getElementById('bz-year').textContent = tianganResult[0] + dizhiResult[0];
+            document.getElementById('bz-month').textContent = tianganResult[1] + dizhiResult[1];
+            document.getElementById('bz-day').textContent = tianganResult[2] + dizhiResult[2];
+            document.getElementById('bz-hour').textContent = tianganResult[3] + dizhiResult[3];
+            
+            // 计算五行统计
+            const wuxing = [
+                wuxingMap[tianganResult[0]] + wuxingMap[dizhiResult[0]],
+                wuxingMap[tianganResult[1]] + wuxingMap[dizhiResult[1]],
+                wuxingMap[tianganResult[2]] + wuxingMap[dizhiResult[2]],
+                wuxingMap[tianganResult[3]] + wuxingMap[dizhiResult[3]]
+            ];
+            
+            const wuxingCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+            wuxing.forEach(w => {
+                w.split('').forEach(c => {
+                    if (wuxingCount[c] !== undefined) wuxingCount[c]++;
+                });
+            });
+            
+            // 显示五行
+            const wuxingStats = document.getElementById('wuxing-stats');
+            wuxingStats.innerHTML = '';
+            Object.entries(wuxingCount).forEach(([wx, count]) => {
+                if (count > 0) {
+                    wuxingStats.innerHTML += `
+                        <div class="wuxing-item">
+                            <div class="wuxing-name wuxing-${wx}">${wx}</div>
+                            <div>${count}个</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            // 生成分析（模拟AI分析）
+            setTimeout(() => {
+                generateAnalysis(tianganResult, dizhiResult, gender, place);
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('result').classList.add('show');
+            }, 1500);
+        }
+        
+        // 生成分析
+        function generateAnalysis(tg, dz, gender, place) {
+            // 简单的分析生成逻辑
+            const dayZhu = tg[2];
+            const wuxing = wuxingMap[dayZhu];
+            
+            // 性格分析
+            const personalityMap = {
+                '木': '你是一个富有生机和活力的人，性格直率坦荡，有较强的创造力和进取心。遇到困难时能够积极面对，有韧性。但有时可能过于固执，要学会变通。',
+                '火': '你是一个热情洋溢的人，富有感染力，喜欢表达自己，社交能力较强。思维敏捷，善于沟通。但有时可能过于急躁，需要学会冷静思考。',
+                '土': '你是一个稳重踏实的人，为人忠厚诚实，值得信赖。注重承诺，有责任感。喜欢稳定的生活和工作环境。但有时可能过于保守。',
+                '金': '你是一个果断坚定的人，有较强的原则性，做事干净利落。善于分析和判断，有领导能力。但有时可能过于严厉。',
+                '水': '你是一个聪明灵活的人，思维敏捷，善于适应变化。性格温和，富有包容心。善于思考和分析问题。但有时可能过于善变。'
+            };
+            
+            document.getElementById('personality').textContent = personalityMap[wuxing] || '你有着独特的个性魅力。';
+            
+            // 感情分析
+            const loveMap = {
+                '木': '感情方面，你需要一个能够尊重你独立性的伴侣。2026年桃花运不错，有机会遇到心仪的人。学会表达感情会让关系更和谐。',
+                '火': '感情中你热情主动，但要注意控制情绪。2026年适合主动出击，但要在沟通中保持耐心。找一个欣赏你热情的人。',
+                '土': '你对待感情认真负责，2026年有望遇到稳定可靠的伴侣。相亲或朋友介绍可能会有好结果。',
+                '金': '2026年感情上有不错的机会，但要小心过于理性的态度会吓退潜在的追求者。学会展现柔软的一面。',
+                '水': '你的魅力在于你的智慧和灵活性，2026年可能会有意想不到的邂逅。保持开放的心态很重要。'
+            };
+            document.getElementById('love').textContent = loveMap[wuxing] || '2026年你的感情运势整体平稳，有机会遇到合适的伴侣。';
+            
+            // 事业分析
+            const careerMap = {
+                '木': '2026年事业发展有突破，适合创业或开展新项目。你的创造力和执行力会得到发挥。贵人运不错，可借助他人力量。',
+                '火': '2026年事业上有晋升机会，但要控制急躁情绪。与同事相处需要更多耐心。适合技术类或需要创新的工作。',
+                '土': '2026年工作稳定，适合在现有岗位上深耕。可能会得到领导的认可和重用。适合管理类或需要稳重的工作。',
+                '金': '2026年事业运较强，有机会获得晋升或重要项目。保持专业的态度会让你更受认可。适合金融、咨询等领域。',
+                '水': '2026年适合需要灵活应变的工作。你的适应能力会让你在变化中找到机会。多尝试新领域可能会有惊喜。'
+            };
+            document.getElementById('career').textContent = careerMap[wuxing] || '2026年你的事业运势整体不错，找准方向很重要。';
+            
+            // 财运分析
+            const fortuneMap = {
+                '木': '2026年财运不错，正财稳定，偏财也有机会。但注意不要过于激进投资，适合稳健理财。可以考虑长期储蓄。',
+                '火': '2026年财运有波动，但整体向好。正财收入会增加，注意控制冲动消费。适合多元化投资组合。',
+                '土': '2026年财运平稳，适合稳扎稳打。正财收入稳定，适合储蓄或购买固定资产。低风险投资更适合你。',
+                '金': '2026年财运较好，有机会获得额外收入。适合投资理财，但要注意风险控制。正财偏财都不错。',
+                '水': '2026年财运灵活，适合需要创意和灵活性的生财方式。可能会有意外的收入来源，但要注意理财规划。'
+            };
+            document.getElementById('fortune').textContent = fortuneMap[wuxing] || '2026年财运整体平稳，合理规划很重要。';
+            
+            // 家庭关系
+            const familyMap = {
+                '木': '你与父母的关系较为平等独立。父母对你的发展寄予厚望，要多表达感恩之情。2026年多关心父母身体。',
+                '火': '你与父母关系亲密，但有时沟通方式需要改进。注意表达方式，父母会更理解你。2026年适合多陪伴家人。',
+                '土': '你与父母关系稳定，是家庭的依靠。2026年要多抽时间陪伴父母，他们的意见值得倾听。',
+                '金': '你与父母关系较为理性，有时可能缺少情感交流。2026年建议主动表达感情，增强亲子关系。',
+                '水': '你与父母关系灵活，沟通良好。2026年要多关注父母的精神需求，陪伴是最好的关爱。'
+            };
+            document.getElementById('family').textContent = familyMap[wuxing] || '珍惜与父母相处的时光，2026年多关心家人。';
+        }
+    </script>
+</body>
+</html>
